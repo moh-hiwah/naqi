@@ -1,0 +1,19 @@
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Firebase private key
+firebase-key.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# System files
+.DS_Store
+Thumbs.db
