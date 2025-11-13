@@ -236,7 +236,7 @@ app.post("/send-reset-link", async (req, res) => {
 
     // توليد رابط إعادة التعيين من Firebase
     const resetLink = await admin.auth().generatePasswordResetLink(email, {
-      url: "https://yourapp.com/reset-password", // 🔄 غير هذا الرابط
+      url: "https://yemen-naql-server.onrender.com/reset-password", // 🔄 غير هذا الرابط
       handleCodeInApp: true
     });
 
