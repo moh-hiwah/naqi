@@ -216,9 +216,71 @@ app.post("/verify-otp", async (req, res) => {
 });
 
 // ================================
-// 🔐 إرسال رابط إعادة تعيين كلمة المرور
+// من تطبيق السائق 🔐 إرسال رابط إعادة تعيين كلمة المرور
 // ================================
-app.post("/send-reset-link", async (req, res) => {
+app.post("/send-reset-link-driver", async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "رقم الهاتف مطلوب" 
+      });
+    }
+
+    const cleanPhone = phone.replace(/\s+/g, '').trim();
+    const email = `${cleanPhone}@driver.com`;
+
+    console.log(`📤 إرسال رابط إعادة التعيين إلى ${cleanPhone}`);
+
+    // توليد رابط إعادة التعيين من Firebase
+    const resetLink = await admin.auth().generatePasswordResetLink(email, {
+      url: "https://naqil-60e33.firebaseapp.com/reset-password", // 🔄 غير هذا الرابط
+      handleCodeInApp: true
+    });
+
+    await client.messages.create({
+      from: "whatsapp:+14155238886",
+      to: `whatsapp:${cleanPhone}`,
+      body: `🔐 لإعادة تعيين كلمة المرور في تطبيق يمن نقل، اضغط على الرابط التالي:\n${resetLink}\n\n⏰ الرابط صالح لمدة 24 ساعة.`,
+    });
+
+    res.json({ 
+      ok: true, 
+      message: "✅ تم إرسال رابط إعادة التعيين إلى واتساب بنجاح" 
+    });
+
+  } catch (error) {
+    console.error("❌ خطأ أثناء إرسال الرابط:", error.message);
+    
+    let errorMessage = "حدث خطأ أثناء إرسال الرابط";
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = "لم يتم العثور على حساب مرتبط بهذا الرقم";
+    }
+    
+    res.status(500).json({ 
+      ok: false, 
+      error: errorMessage 
+    });
+  }
+});
+
+// ================================
+// 🩺 نقطة فحص صحة السيرفر
+// ================================
+app.get("/health", (req, res) => {
+  res.json({ 
+    ok: true, 
+    message: "✅ السيرفر يعمل بشكل طبيعي",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ================================
+// من تطبيق العميل 🔐 إرسال رابط إعادة تعيين كلمة المرور
+// ================================
+app.post("/send-reset-link-client", async (req, res) => {
   try {
     const { phone } = req.body;
 
@@ -236,7 +298,7 @@ app.post("/send-reset-link", async (req, res) => {
 
     // توليد رابط إعادة التعيين من Firebase
     const resetLink = await admin.auth().generatePasswordResetLink(email, {
-      url: "https://yourapp.com/reset-password", // 🔄 غير هذا الرابط
+      url: "https://naqil-60e33.firebaseapp.com/reset-password", // 🔄 غير هذا الرابط
       handleCodeInApp: true
     });
 
