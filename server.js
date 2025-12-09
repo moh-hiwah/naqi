@@ -298,7 +298,9 @@ app.post("/send-reset-link-client", async (req, res) => {
 
     // توليد رابط إعادة التعيين من Firebase
     const resetLink = await admin.auth().generatePasswordResetLink(email, {
+
       url: "https://naqil-60e33.firebaseapp.com/reset-password", // 🔄 غير هذا الرابط
+
       handleCodeInApp: true
     });
 
